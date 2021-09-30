@@ -1,0 +1,110 @@
+0. MySQL beállítás :
+
+    0.1 Lóránttól kaptunk egy mysql-8.0.20-winx64 mappát, oda navigáljunk el a konzolon a ../mysql-8.0.20-winx64/bin mappáig. Keressük ki a Windows programok között a 'CMD' keresőszóval a konzolt
+
+    Parancsok:
+
+        [ cd .. ] - egy mappával feljebb lépés
+        [ cd mappaneve ] mappa megnyitása
+        [ Meghajtó neve: ] arra a meghajtóra ugrás
+        [ mysqld --console --port XXXXX ] a port amit megnyitunk és szeretnénk ha a Workbenchen ez a port lenne használva 13306 mostanság
+
+    ! A konzolt ne zárjuk be, mert akkor oda a kapcsolat !
+
+    0.2 MySQL Workbench
+
+        2 db SQL file lesz, amit le kell futtatni. Először egy localhost@root:13306 alatt hozzuk létre a felhasználót, aki majd a táblákat létrehozza. Ha nincs meg ez a csatlakozási pont, akkor:
+        + jel
+            Connection name: localhost@root:13306
+            Port: 13306
+            Username: root
+            Password: password123 - ha bekonfiguráltuk a Lóránt ini file-ja szerint
+
+        Test connection, ha minden oké, akkor nyissuk meg és másoljuk be az 1. SQL parancsokat, amiket kaptunk Lóránntól. Ha létrejött az új felhasználó, akkor azzal hozzunk létre egy csatlakozási pontot a megadott értékek alapján:
+        + jel
+            Connection name: localhost@[ megadott név ]:13306
+            Port: 13306
+            Username: [ megadott név ]
+            Password: [ megadott jelszó ]  
+
+        Test connection, ha minden oké, akkor nyissuk meg és másoljuk be az 2. SQL parancsokat, amiket kaptunk Lóránntól. Ha mindenhol zöld pipát kaptunk, jöhet a Spring Boot    
+
+1. Spring Boot pom.xml dependencia súgókártya
+
+    Ezt alapjáraton belepakolja:
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-web</artifactId>
+            </dependency>
+
+    Ezt alapjáraton belepakolja:
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-test</artifactId>
+                <scope>test</scope>
+            </dependency>
+            
+    Tomcat:
+            <dependency>
+                <groupId>org.apache.tomcat.embed</groupId>
+                <artifactId>tomcat-embed-jasper</artifactId>
+            </dependency>
+            
+    JAVA servlet:
+            <dependency>
+                <groupId>javax.servlet</groupId>
+                <artifactId>jstl</artifactId>
+            </dependency>
+        
+    MySQL connetor:		
+            <dependency>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+            </dependency>	
+        
+    JPA:	
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-data-jpa</artifactId>
+            </dependency>
+
+2. A package-k, amiket letre kell hozni xx.xxxxx.xx.packageNeve formatumban. Nagy valószínűséggel eu.pontsystems.javatanfolyam.feladatneve lesz a séma:
+
+    eu.pontsystems.javatanfolyam.feladatneve ( ebben van benne a feladatneveApplication, amely a konfigurácónál szükséges lesz majd, ez már készen fogad minket. ! Ügyeljetek arra, hogy ez legyen felül ! )
+    eu.pontsystems.javatanfolyam.feladatneve.controller
+    eu.pontsystems.javatanfolyam.feladatneve.entity
+    eu.pontsystems.javatanfolyam.feladatneve.repository
+    eu.pontsystems.javatanfolyam.feladatneve.service
+
+3. Zöld nyilacska ikon MELLETTI lefele mutató fekete nyíl:
+    Run configuration >
+        Spring Boot App bal oldalt 2x katt rá
+            Spring boot fül:
+                Lóránt sémája szerint: [feladat neve] sb run
+                project legördülőből: feladat neve
+                Main type: ezt tudja automatikusan, válasszuk ki
+                Enable debug output checkbox pipa
+            JRE fül:
+                Alternate JRE: jdk-8u251
+
+Eppláj end klóz
+                
+4. src mappaszerkezet:
+
+    src / main / webapp / WEB-INF / jsp 
+jsp-be jönnek majd a fileok, amelyek a HTML kódban íródnak (jsp-k)
+
+5. application.properties az src / main / resources mappában:
+    Ezt másold be, de ügyelj a [ ] helyekre!
+
+        spring.mvc.view.prefix=/WEB-INF/jsp/
+        spring.mvc.view.suffix=.jsp
+        server.port=18080
+        spring.jpa.hibernate.ddl-auto=update
+        spring.datasource.url=jdbc:mysql://localhost:13306/[ sql adatbázis neve ]?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC
+        spring.datasource.username=[ sql adatbázis szerinti érték ]
+        spring.datasource.password=[ sql adatbázis szerinti érték ]
+        spring.jpa.database=mysql
+
+
+
