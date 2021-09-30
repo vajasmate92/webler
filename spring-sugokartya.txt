@@ -31,38 +31,36 @@
 
 1. Spring Boot pom.xml dependencia súgókártya
 
-    Ezt alapjáraton belepakolja:
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-web</artifactId>
             </dependency>
 
-    Ezt alapjáraton belepakolja:
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-test</artifactId>
                 <scope>test</scope>
             </dependency>
             
-    Tomcat:
+    <-- Tomcat -->
             <dependency>
                 <groupId>org.apache.tomcat.embed</groupId>
                 <artifactId>tomcat-embed-jasper</artifactId>
             </dependency>
             
-    JAVA servlet:
+    <-- JSTL -->
             <dependency>
                 <groupId>javax.servlet</groupId>
                 <artifactId>jstl</artifactId>
             </dependency>
         
-    MySQL connetor:		
+    <-- MySQL connetor -->		
             <dependency>
                 <groupId>mysql</groupId>
                 <artifactId>mysql-connector-java</artifactId>
             </dependency>	
         
-    JPA:	
+    <-- JPA -->	
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-data-jpa</artifactId>
@@ -92,19 +90,50 @@ Eppláj end klóz
 4. src mappaszerkezet:
 
     src / main / webapp / WEB-INF / jsp 
-jsp-be jönnek majd a fileok, amelyek a HTML kódban íródnak (jsp-k)
+jsp-be jönnek majd a fileok, amelyek a HTML kódban íródnak ( jsp-k )
 
 5. application.properties az src / main / resources mappában:
-    Ezt másold be, de ügyelj a [ ] helyekre!
+    Ezt másold be, de ügyelj a [] helyekre!
 
         spring.mvc.view.prefix=/WEB-INF/jsp/
         spring.mvc.view.suffix=.jsp
         server.port=18080
         spring.jpa.hibernate.ddl-auto=update
-        spring.datasource.url=jdbc:mysql://localhost:13306/[ sql adatbázis neve ]?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC
-        spring.datasource.username=[ sql adatbázis szerinti érték ]
-        spring.datasource.password=[ sql adatbázis szerinti érték ]
+        spring.datasource.url=jdbc:mysql://localhost:13306/[sql adatbázis neve]?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC
+        spring.datasource.username=[sql adatbázis szerinti érték]
+        spring.datasource.password=[sql adatbázis szerinti érték]
         spring.jpa.database=mysql
 
+6. Az egész MVC modell szerkezete és az egyes elemek feladatai:
+	
+	eu.pontsystems.javatanfolyam.feladatneve
+		Ebben a csomagban van a belépési pontunk. Ezt adjuk meg a konfigurálásnál, ezt a Spring Boot elkészíti nekünk, dolgunk nincs vele.
 
+	eu.pontsystems.javatanfolyam.feladatneve.controller
+		Ebebn a csomagban vannak a visszatérési értékei az egyes oldalaknak.
+            Először is megkapja a @Controller annotációt a public class ...Controller { felett
+            Itt az alábbi annotációkat használtuk:
+                @Autowired - összekötjük az egyes osztályokkal, így hozzáférünk azoknak a metódusaihoz, értékeihez. A Controllereket a Service objektumokkal drótoztuk össze ilyen módon:
+                    @Autowired
+                    private ValamiService [ változónév ]; 
 
+                @GetMapping ( "url/celurl" ) - elnavigál celurl oldalra, ahol végrehajtja az alatta lévő metódust. Egy példa az előző feladatból - szeretnénk kilistázni az elutasított hitelkérelmeket:
+                    @GetMapping ( "loan/rejected" ) - megadtuk, hogy a rejected URL-re navigáljon el bennünket
+                    public String viewAllRejected(Model model) {            - ez a metódus, amivel kilistázzuk azokat a hitelkérelmeket, amelyek el lettek utasítva. Ennek egyik paramétere egy Model, ami majd magába foglalja a lekérdezett adatokat.
+                        model.addAttribute("loans",ls.getAllRejected());    - meghívjuk erre a model paraméterre az addAttribute metódust. Ezt a metódust úgy húztuk elő a kalapból, hogy összekötöttük @Autowireddel a LoanService osztállyal ezt a Controllert, a LoanService-t pedig @Autowireddel összekötöttük a LoanReository-val, ami egy JpaRepository-ból leszármaztatott Interface, így eléri a JpaRepository metódusait, amiben ez az addAttribute () metódus is megtalálható.
+                                                                                                        - Az addAttribute metódus paraméterei ( "loans" - ezen a néven fogod meghívni azon az oldalon, ahol szeretnéd hogy megjelenjen. Jelen példában: items="${loans}"
+                                                                                                        - második paraméterként meghívjuk rá a ls . getAllRejected () metódust, ami a LoanService objektumban már megírtunk. Etz a metódus egy List típusú változóval tér vissza, amit a Loan entity-ből származtattunk, és rákeres és List-be példányosít minden olyan értéket, amelynek az állapota "REJECTED" )
+                        return "loanlistrejected";                                         - ez pedig visszatér azzal a névvel, amire a jsp file-t neveztük el, ahol ezt meg szeretnénk jeleníteni
+                    }
+                    Összefoglalva: @GetMapping - megadtuk, hogy a megadott url alatt melyik jsp file legyen elérhető. Egy Model-t lérehoztunk, megadtunk neki egy nevet, amivel a jsp fileon belül hivatkozunk, ebbe a Modelbe bepakoltunk egy List-et, amit egy szűrés szerint kaptunk meg. Ez pedig osztályokon át ment a @Autowired annotáció segítségével.
+
+	eu.pontsystems.javatanfolyam.feladatneve.entity
+		Egy oylan POJO, amely az adatbázis tábláinak értékeinek a kerete. Mint az eddig tanultak alapján, ezt az objektumot példányosítjuk és az egyes példányait töltjük fel a megfelelő adatokkal, DE most nem egy bufferedreaerrel ovassuk ki az értékeket, hanem az adatbázisból kérjük le ezeket metódusokon át. 
+		Vannak paraméterei az adatbázis szerint
+		Van egy konstrutora, amivel példányosíthatjuk
+		Van egy üres konstruktora, ha csak meg akarjuk hívni és utána setterekkel felparaméterezni
+		Vannak getterei
+		Vannak setterei
+		Illetve Blahut Lóránt, a JAVA (TM) ikonja megfűzerezi az egészet egy toString () { } metódussal, amely visszatér egy String értékkel, kiírva hogy az adott objektum milyen adatokat tartalmaz
+ 
+    eu.pontsystems.javatanfolyam.feladatneve.repository
