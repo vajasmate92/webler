@@ -135,8 +135,9 @@ jsp-be jönnek majd a fileok, amelyek a HTML kódban íródnak ( jsp-k )
 		Vannak getterei
 		Vannak setterei
 		Illetve Blahut Lóránt, a JAVA (TM) ikonja megfűzerezi az egészet egy toString () { } metódussal, amely visszatér egy String értékkel, kiírva hogy az adott objektum milyen adatokat tartalmaz
+		FONTOS! Az entity neve legyen mindig ugyan az, mint az adatbázis tábla neve. Kezdheted nagy betűvel, mivel objektum.
  
     eu.pontsystems.javatanfolyam.feladatneve.repository
 
-Az entity neve legyen mindig ugyan az, mint az adatbázis tábla neve
+
 Ha a JSP file-ba szeretnénk írni, legfelülre helyezzük el a <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %> kódot, és akkor a c:ForEach menni fog.
